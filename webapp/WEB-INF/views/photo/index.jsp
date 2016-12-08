@@ -49,7 +49,7 @@
 		                            "visualFeatures": "Tags",
 		                            "language": "en"
 		                        };
-		   						var url = "http://localhost:8088/${pageContext.request.contextPath }/photo/assets/"+response.data;
+		   						var url = "https://7f89983b-0ee0-4-231-b9ee.azurewebsites.net/${pageContext.request.contextPath }/photo/assets/"+response.data;
 		   						console.log("{" +
 			                             "\"url\":\"" + url + "\"}")
 		    					 $.ajax({
