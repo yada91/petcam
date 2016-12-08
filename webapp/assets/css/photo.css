@@ -1,0 +1,112 @@
+@CHARSET "UTF-8";
+@import "mysite.css";
+
+#gallery		{ margin:20px auto;	width:540px; }
+#gallery h1		{
+	color: #5C5C5C;
+	margin-bottom:10px;
+	background:url('/mysite4/assets/images/gallery.png') 0 0 no-repeat;
+	background-size: 35px;
+	padding-left:40px;
+	float:left;
+}
+
+#gallery ul			{ width: 100%; clear:both; }
+#gallery ul li		{
+	position:relative;
+	float:left; 
+	padding:2px;
+	border:1px solid #ccc;
+	!border-radius:3px;
+	background-color:#f0f0f0;
+	margin:0 0 10px 10px;
+	height:114px;
+	width:114px;
+	overflow-y:hidden;
+}
+	
+#gallery ul li a	{
+	display:block;
+	font-size:0;
+	text-indent:-10000px;
+	outline:none;	
+}
+
+#gallery ul li a.image {
+	width:114px;
+	height:114px;
+	background-size: 114px;
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+#gallery ul li a.del-button {
+	position:absolute;
+	width:20px;
+	height:20px;
+	font-size:0;	
+	background:url('/mysite4/assets/images/delete-imge.png') 0 0 no-repeat;
+	background-size:18px;
+	right:2px;
+	top:3px;
+	display:none;
+}
+
+#gallery ul li:hover a.del-button {
+	display:block;
+}
+
+#upload-image {
+	text-decoration:none;
+	display: block;
+	float: right;
+	padding:10px 10px 10px 10px ; 
+	border:1px solid #2080D0; 
+	font-weight:bold; 
+	background-color:#E8ECF6; 
+	color:#111;
+	margin-bottom: 10px;
+	outline:none; 	
+}
+#upload-image1 {
+	text-decoration:none;
+	display: block;
+	float: right;
+	padding:10px 10px 10px 10px ; 
+	border:1px solid #2080D0; 
+	font-weight:bold; 
+	background-color:#E8ECF6; 
+	color:#111;
+	margin-bottom: 10px;
+	outline:none; 	
+}
+#dialog-upload-form {
+	text-align: left;	
+}
+	
+#dialog-upload-form p {
+	padding:20px 0 5px 0;
+	font-weight: bold;
+	font-size:1.1em
+}
+
+#dialog-upload-form label,
+#dialog-upload-form input {
+	display:block;
+}
+
+#dialog-upload-form label {
+	font-weight:bold;
+	margin-top:10px;
+}
+
+#dialog-upload-form input {
+	outline:none;
+	margin-top:5px;
+}
+
+#dialog-upload-form input[type='text'] {
+	padding: 5px;
+	border:2px solid #A9A9A9;
+	width:260px;
+}
