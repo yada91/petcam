@@ -16,11 +16,11 @@
 	rel="stylesheet" type="text/css">
 <link rel="stylesheet"
 	href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<script type="text/javascript"
-	src="${pageContext.request.contextPath }/assets/js/jquery/jquery-1.9.0.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
 	var dialog;
+	var imgPath;
 	$(function() {
 		dialog = $("#dialog-form").dialog({
 			autoOpen : false,
@@ -29,15 +29,62 @@
 			modal : true,
 			buttons : {
 				"upload" : function() {
-					$("#dialog-form form").submit();
+					var formData = new FormData();
+		        	  formData.append("comments", $("input[name=comments]").val());
+		        	  formData.append("file", $("input[name=file]")[0].files[0]);
+		        	  
+		        		$.ajax({
+		    				url : "${pageContext.request.contextPath }/photo/upload",
+		    				data: formData,
+		            	    processData: false,
+		            	    contentType: false,
+		            	    type: 'POST',
+		    				success : function(response) {
+		    					if (response.result != "success") {
+		    						console.error(response.message);
+		    						return;
+		    					}
+		    					
+		    					var params = {
+		                            "visualFeatures": "Tags",
+		                            "language": "en"
+		                        };
+		   						var url = "http://localhost:8088/${pageContext.request.contextPath }/photo/assets/"+response.data;
+		   						console.log("{" +
+			                             "\"url\":\"" + url + "\"}")
+		    					 $.ajax({
+		                             url: "https://api.projectoxford.ai/vision/v1.0/analyze?" + $.param(params),
+		                             beforeSend: function (xhrObj) {
+		                                 xhrObj.setRequestHeader("Content-Type", "application/json");
+		                                 xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key", "bca72475d52c4906b7eb422ab7ac1788");
+		                             },
+		                             type: "POST",
+		                             data: "{" +
+		                             "\"url\":\"" + url + "\"}"
+		                         })
+		                                 .done(function (response) {
+		                                	 console.log("ms api")
+		                                	 $("#tags").val(response['tags'][i].name);
+		                                 })
+		                                 .fail(function (response) {
+		                                     alert(JSON.stringify(response));
+		                                 });
+		    				},
+		    				error : function(jqXHR, status, e) {
+		    					console.log(status + ":" + e);
+		    				}
+		    			});
+
 				},
 				Cancel : function() {
 					dialog.dialog("close");
 				}
+
 			},
 			close : function() {
 			}
 		});
+
 		$("#upload-image").click(function(event) {
 			//event.preeventDefault();
 			dialog.dialog("open");
@@ -48,37 +95,6 @@
 							//event.preeventDefault();
 							window.location.href = "${pageContext.request.contextPath }/users/loginform";
 						});
-	});
-</script>
-<script type="text/javascript">
-	$(function() {
-		var params = {
-			// Request parameters
-			"visualFeatures" : "Categories",
-			"details" : "{string}",
-			"language" : "en",
-		};
-
-		$.ajax(
-				{
-					url : "https://api.projectoxford.ai/vision/v1.0/analyze?"
-							+ $.param(params),
-					beforeSend : function(xhrObj) {
-						// Request headers
-						xhrObj.setRequestHeader("Content-Type",
-								"application/json");
-						xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key",
-								"d132a58c2f9f4a7bb94fc55ef53175ed");
-					},
-					type : "POST",
-					// Request body
-					data : "{" +
-                    "\"url\":\"" + imgPath + "\"}",
-				}).done(function(data) {
-			alert("success");
-		}).fail(function() {
-			alert("error");
-		});
 	});
 </script>
 </head>
@@ -99,13 +115,14 @@
 					</c:choose>
 
 				</div>
-
+				<div class="col-xs-12 col-md-12">
+					<p id="tags"></p>
+				</div>
 				<ul>
 					<c:forEach items="${list }" var="vo">
 						<c:choose>
 							<c:when test="${vo.extName eq 'mp4'}">
 								<video width="320" height="240" controls preload="auto">
-
 									<source
 										src="${pageContext.request.contextPath }/photo/assets/${vo.saveFileName}"
 										type="video/mp4" />

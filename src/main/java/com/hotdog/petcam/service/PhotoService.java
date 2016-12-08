@@ -67,7 +67,7 @@ public class PhotoService {
 			insert(vo);
 
 			writeFile(file, saveFileName);
-			url = URL + saveFileName;
+			url = saveFileName;
 		} catch (IOException e) {
 
 		}

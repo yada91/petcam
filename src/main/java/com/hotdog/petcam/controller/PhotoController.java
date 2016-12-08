@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hotdog.petcam.DTO.JSONResult;
 import com.hotdog.petcam.service.PhotoService;
 import com.hotdog.petcam.vo.Photo;
 import com.hotdog.petcam.vo.Users;
-import com.hotdog.security.Auth;
 import com.hotdog.security.AuthUser;
 
 @Controller
@@ -31,13 +32,12 @@ public class PhotoController {
 		return "photo/index";
 	}
 
-	@Auth
+	@ResponseBody
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	public String upload(@RequestParam("file") MultipartFile file, @RequestParam("comments") String comments,
+	public JSONResult upload(@RequestParam("file") MultipartFile file, @RequestParam("comments") String comments,
 			Model model, @AuthUser Users authUser) {
-		System.out.println(authUser);
-		photoService.restore(file, comments, authUser.getNo());
-		return "redirect:/photo";
+		String saveFileName = photoService.restore(file, comments, authUser.getNo());
+		return JSONResult.success(saveFileName);
 	}
 
 	@RequestMapping("/view")
