@@ -20,71 +20,55 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
 	var dialog;
-	var imgPath;
+	var img;
 	$(function() {
-		dialog = $("#dialog-form").dialog({
-			autoOpen : false,
-			height : 300,
-			width : 250,
-			modal : true,
-			buttons : {
-				"upload" : function() {
-					var formData = new FormData();
-		        	  formData.append("comments", $("input[name=comments]").val());
-		        	  formData.append("file", $("input[name=file]")[0].files[0]);
-		        	  
-		        		$.ajax({
-		    				url : "${pageContext.request.contextPath }/photo/upload",
-		    				data: formData,
-		            	    processData: false,
-		            	    contentType: false,
-		            	    type: 'POST',
-		    				success : function(response) {
-		    					if (response.result != "success") {
-		    						console.error(response.message);
-		    						return;
-		    					}
-		    					
-		    					var params = {
-		                            "visualFeatures": "Tags",
-		                            "language": "en"
-		                        };
-		   						var url = "https://7f89983b-0ee0-4-231-b9ee.azurewebsites.net/${pageContext.request.contextPath }/photo/assets/"+response.data;
-		   						console.log("{" +
-			                             "\"url\":\"" + url + "\"}")
-		    					 $.ajax({
-		                             url: "https://api.projectoxford.ai/vision/v1.0/analyze?" + $.param(params),
-		                             beforeSend: function (xhrObj) {
-		                                 xhrObj.setRequestHeader("Content-Type", "application/json");
-		                                 xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key", "bca72475d52c4906b7eb422ab7ac1788");
-		                             },
-		                             type: "POST",
-		                             data: "{" +
-		                             "\"url\":\"" + url + "\"}"
-		                         })
-		                                 .done(function (response) {
-		                                	 console.log("ms api")
-		                                	 $("#tags").val(response['tags'][i].name);
-		                                 })
-		                                 .fail(function (response) {
-		                                     alert(JSON.stringify(response));
-		                                 });
-		    				},
-		    				error : function(jqXHR, status, e) {
-		    					console.log(status + ":" + e);
-		    				}
-		    			});
+		dialog = $("#dialog-form")
+				.dialog(
+						{
+							autoOpen : false,
+							height : 300,
+							width : 250,
+							modal : true,
+							buttons : {
+								"upload" : function() {
+									var formData = new FormData();
+									formData.append("comments", $(
+											"input[name=comments]").val());
+									formData.append("file",
+											$("input[name=file]")[0].files[0]);
+									//업로드 시작
+									$
+											.ajax({
+												url : "${pageContext.request.contextPath }/photo/upload",
+												data : formData,
+												processData : false,
+												contentType : false,
+												type : 'POST',
+												success : function(response) {
+													if (response.result != "success") {
+														console
+																.error(response.message);
+														return;
+													}
+													img = response.data;
+													setTimeout(analysis, 1000);
 
-				},
-				Cancel : function() {
-					dialog.dialog("close");
-				}
+												},
+												error : function(jqXHR, status,
+														e) {
+													console.log(status + ":"
+															+ e);
+												}
+											});
 
-			},
-			close : function() {
-			}
-		});
-
+								},
+								Cancel : function() {
+									dialog.dialog("close");
+								}
+							},
+							close : function() {
+							}
+						});
 		$("#upload-image").click(function(event) {
 			//event.preeventDefault();
 			dialog.dialog("open");
@@ -95,7 +79,44 @@
 							//event.preeventDefault();
 							window.location.href = "${pageContext.request.contextPath }/users/loginform";
 						});
+
 	});
+
+	var analysis = function() {
+		console.log("analysis start....");
+		//업로드 끝
+		var formData1 = new FormData();
+		//formData1.append("smartCropping", "true");
+		//formData1.append("comments", "18");
+		//console.log( $("input[name=file]")[0].files[0] );
+		formData1.append("", $("input[name=file]")[0].files[0]);
+
+		//ms 시작
+		var params = {
+			"visualFeatures" : "Tags",
+			"language" : "en"
+		};
+		$.ajax(
+				{
+					url : "https://api.projectoxford.ai/vision/v1.0/analyze?"
+							+ $.param(params),
+					processData : false,
+					contentType : false,
+					beforeSend : function(xhrObj) {
+						xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key",
+								"bca72475d52c4906b7eb422ab7ac1788");
+					},
+
+					type : "POST",
+					data : formData1
+				}).done(function(response) {
+			for (i = 0; i < response['tags'].length; i++)
+					console.log(response['tags'][i].name);
+		}).fail(function(response) {
+			alert(JSON.stringify(response));
+		});
+	}
+	//ms 끝
 </script>
 </head>
 <body>

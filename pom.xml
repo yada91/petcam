@@ -147,7 +147,12 @@
 			<version>4.2.0.Final</version>
 		</dependency>
 
-
+<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+<dependency>
+    <groupId>commons-codec</groupId>
+    <artifactId>commons-codec</artifactId>
+    <version>1.9</version>
+</dependency>
 	</dependencies>
 
 	<repositories>
@@ -187,7 +192,7 @@
 				<artifactId>tomcat-maven-plugin</artifactId>
 				<configuration>
 					<url>http://127.0.0.1:8088/manager/text</url>
-					<path>/jblog</path>
+					<path>/petcam</path>
 					<username>tomcat</username>
 					<password>tomcat</password>
 				</configuration>
