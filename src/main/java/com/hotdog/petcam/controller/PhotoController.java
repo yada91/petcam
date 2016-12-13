@@ -35,15 +35,13 @@ public class PhotoController {
 		model.addAttribute("list", list);
 		return "photo/index";
 	}
-    @ResponseBody
+
+	@ResponseBody
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	public JSONResult upload(@RequestParam("file") MultipartFile file, @RequestParam("comments") String comments, Model model,
-			@AuthUser Users authUser,HttpServletResponse response) throws IOException {
-    	photoService.restore(file, comments, authUser.getNo());
-//    	byte[] encodedBytes = Base64.encodeBase64(file.getBytes());
-    	byte[] encodedBytes = file.getBytes();
-//    	System.out.println(  new String( encodedBytes, 0, encodedBytes.length) );
-    	return JSONResult.success( encodedBytes );
+	public JSONResult upload(@RequestParam("file") MultipartFile file, @RequestParam("comments") String comments,
+			Model model, @AuthUser Users authUser, HttpServletResponse response) throws IOException {
+		String saveFileName = photoService.restore(file, comments, authUser.getNo());
+		return JSONResult.success(saveFileName);
 	}
 
 	@RequestMapping("/view")

@@ -2,9 +2,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
-<%
-	pageContext.setAttribute("newLine", "\n");
-%>
 <!doctype html>
 <html>
 <head>
@@ -20,47 +17,52 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
 	var dialog;
-	var img;
+	var file,formData;
+	var tags = "";
 	$(function() {
 		dialog = $("#dialog-form")
-				.dialog(
-						{
+				.dialog({
 							autoOpen : false,
 							height : 300,
 							width : 250,
 							modal : true,
 							buttons : {
 								"upload" : function() {
-									var formData = new FormData();
-									formData.append("comments", $(
-											"input[name=comments]").val());
-									formData.append("file",
-											$("input[name=file]")[0].files[0]);
-									//업로드 시작
-									$
-											.ajax({
-												url : "${pageContext.request.contextPath }/photo/upload",
-												data : formData,
-												processData : false,
-												contentType : false,
-												type : 'POST',
-												success : function(response) {
-													if (response.result != "success") {
-														console
-																.error(response.message);
-														return;
-													}
-													img = response.data;
-													setTimeout(analysis, 1000);
-
-												},
-												error : function(jqXHR, status,
-														e) {
-													console.log(status + ":"
-															+ e);
-												}
-											});
-
+									formData = new FormData();
+									tags=$("input[name=comments]").val()+" ";
+									file=$("input[name=file]")[0].files[0];
+									formData.append("file",file);
+									if("video/mp4"== file.type){
+										setTimeout(upload,100);
+									}else{
+									//ms 시작
+									var params = {
+										"visualFeatures" : "Tags",
+										"language" : "en"
+									};
+									$.ajax({url : "https://api.projectoxford.ai/vision/v1.0/analyze?"
+																+ $.param(params),
+														processData : false,
+														contentType : false,
+														beforeSend : function(xhrObj) {
+															xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key","bca72475d52c4906b7eb422ab7ac1788");
+														},
+														type : "POST",
+														data : formData
+													})
+											.done(function(response) {
+														for (i = 0; i < response['tags'].length; i++) {
+															console.log(response['tags'][i].name);
+															tags += response['tags'][i].name + " ";
+														}
+														$("input[name=comments]").val(tags);
+														setTimeout(upload,1000);
+													})
+											.fail(function(response) {
+														alert(JSON.stringify(response));
+													});
+									//ms 끝
+									}
 								},
 								Cancel : function() {
 									dialog.dialog("close");
@@ -70,53 +72,37 @@
 							}
 						});
 		$("#upload-image").click(function(event) {
-			//event.preeventDefault();
 			dialog.dialog("open");
 		});
-		$("#upload-image1")
-				.click(
-						function(event) {
-							//event.preeventDefault();
-							window.location.href = "${pageContext.request.contextPath }/users/loginform";
-						});
+		$("#upload-image1").click(function(event) {
+			window.location.href = "${pageContext.request.contextPath }/users/loginform";
+		});
 
 	});
 
-	var analysis = function() {
-		console.log("analysis start....");
-		//업로드 끝
-		var formData1 = new FormData();
-		//formData1.append("smartCropping", "true");
-		//formData1.append("comments", "18");
-		//console.log( $("input[name=file]")[0].files[0] );
-		formData1.append("", $("input[name=file]")[0].files[0]);
-
-		//ms 시작
-		var params = {
-			"visualFeatures" : "Tags",
-			"language" : "en"
-		};
-		$.ajax(
-				{
-					url : "https://api.projectoxford.ai/vision/v1.0/analyze?"
-							+ $.param(params),
-					processData : false,
-					contentType : false,
-					beforeSend : function(xhrObj) {
-						xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key",
-								"bca72475d52c4906b7eb422ab7ac1788");
-					},
-
-					type : "POST",
-					data : formData1
-				}).done(function(response) {
-			for (i = 0; i < response['tags'].length; i++)
-					console.log(response['tags'][i].name);
-		}).fail(function(response) {
-			alert(JSON.stringify(response));
+	var upload = function() {
+		//업로드 시작
+		formData.append("comments", tags);
+		$.ajax({
+			url : "${pageContext.request.contextPath }/photo/upload",
+			data : formData,
+			processData : false,
+			contentType : false,
+			type : 'POST',
+			success : function(response) {
+				if (response.result != "success") {
+					console.error(response.message);
+					return;
+				}
+				dialog.dialog("close");
+				window.location.href = "${pageContext.request.contextPath }/photo";
+			},
+			error : function(jqXHR, status, e) {
+				console.log(status + ":" + e);
+			}
 		});
+		//업로드 끝
 	}
-	//ms 끝
 </script>
 </head>
 <body>
@@ -136,9 +122,7 @@
 					</c:choose>
 
 				</div>
-				<div class="col-xs-12 col-md-12">
-					<p id="tags"></p>
-				</div>
+
 				<ul>
 					<c:forEach items="${list }" var="vo">
 						<c:choose>
@@ -169,8 +153,9 @@
 			<form method="post"
 				action="${pageContext.request.contextPath }/photo/upload"
 				enctype="multipart/form-data">
-				<input type="file" name="file"> <br> comments:<input
-					type="text" name="comments">
+				<div><input type="file" name="file"></div>
+				<div> comments:<input
+					type="text" name="comments"></div>
 			</form>
 		</div>
 	</div>

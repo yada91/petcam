@@ -28,7 +28,7 @@
        		   REG_DATE as regDate,
        		   USERS_NO as usersNo
   			FROM photo
- 		WHERE no = #{no}
+ 		WHERE no = #{no} 
 		]]>
 	</select>
 
@@ -43,7 +43,7 @@
        		   FILE_SIZE as fileSize,
        		   REG_DATE as regDate,
        		   USERS_NO as usersNo
-  			FROM photo
+  			FROM photo order by reg_date
 		]]>
 	</select>
 
