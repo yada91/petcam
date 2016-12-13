@@ -1,11 +1,11 @@
-@CHARSET "UTF-8";
+CHARSET "UTF-8";
 @import "mysite.css";
 
 #gallery		{ margin:20px auto;	width:540px; }
 #gallery h1		{
 	color: #5C5C5C;
 	margin-bottom:10px;
-	background:url('/mysite4/assets/images/gallery.png') 0 0 no-repeat;
+	background:url('/petcam/assets/images/gallery.png') 0 0 no-repeat;
 	background-size: 35px;
 	padding-left:40px;
 	float:left;
@@ -20,8 +20,8 @@
 	!border-radius:3px;
 	background-color:#f0f0f0;
 	margin:0 0 10px 10px;
-	height:114px;
-	width:114px;
+	height:240px;
+	width:320px;
 	overflow-y:hidden;
 }
 	
@@ -33,9 +33,9 @@
 }
 
 #gallery ul li a.image {
-	width:114px;
-	height:114px;
-	background-size: 114px;
+	width:320px;
+	height:240px;
+	background-size: 230px;
 	background-repeat: no-repeat;
 	background-position: center center;
 }
@@ -45,7 +45,7 @@
 	width:20px;
 	height:20px;
 	font-size:0;	
-	background:url('/mysite4/assets/images/delete-imge.png') 0 0 no-repeat;
+	background:url('/petcam/assets/images/delete-imge.png') 0 0 no-repeat;
 	background-size:18px;
 	right:2px;
 	top:3px;

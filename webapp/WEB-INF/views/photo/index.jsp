@@ -19,6 +19,8 @@
 	var dialog;
 	var file,formData;
 	var tags = "";
+	var header;
+	var operationUrl;
 	$(function() {
 		dialog = $("#dialog-form")
 				.dialog({
@@ -32,8 +34,30 @@
 									tags=$("input[name=comments]").val()+" ";
 									file=$("input[name=file]")[0].files[0];
 									formData.append("file",file);
+								
 									if("video/mp4"== file.type){
-										setTimeout(upload,100);
+										setTimeout(upload,1);
+										var geturl=	$.ajax({
+								            url: "https://api.projectoxford.ai/video/v1.0/detectmotion?",
+								        	processData : false,
+											contentType : false,
+								            beforeSend: function(xhrObj){
+								            	 xhrObj.setRequestHeader( "Content-Type","application/octet-stream" );
+								                xhrObj.setRequestHeader( "Ocp-Apim-Subscription-Key","61fd7260b44d453db04c22e9c4550310" );
+								            },
+								            type: "POST",
+								            data: formData,
+								        })
+								        .done(function(XMLHttpRequest,textStatus) {
+								            console.log( "success" );
+								         	header =geturl.getAllResponseHeaders();
+								         	operationUrl=header.split( "\n" )[1].replace( "Operation-Location:", "" ).trim();
+								         	console.log( operationUrl );
+								          	setTimeout( fetchVideoInfo, 10000 );
+								        })
+								        .fail(function () {
+								            alert("error");
+								        });
 									}else{
 									//ms 시작
 									var params = {
@@ -103,12 +127,26 @@
 		});
 		//업로드 끝
 	}
+	var fetchVideoInfo = function() {
+		$.ajax({
+            url: operationUrl,
+            beforeSend: function(xhrObj){
+                xhrObj.setRequestHeader( "Ocp-Apim-Subscription-Key","61fd7260b44d453db04c22e9c4550310" );
+            },
+        })
+        .done(function(response) {
+            console.log(response);
+        })
+        .fail(function () {
+            alert("error");
+        });
+	}
 </script>
 </head>
 <body>
 	<div id="container">
 		<div id="content">
-			<div id="photo">
+			<div id="gallery">
 
 				<div>
 					<h1>갤러리</h1>
@@ -127,20 +165,20 @@
 					<c:forEach items="${list }" var="vo">
 						<c:choose>
 							<c:when test="${vo.extName eq 'mp4'}">
-								<video width="320" height="240" controls preload="auto">
+								<li><video width="320" height="240" controls preload="auto">
 									<source
 										src="${pageContext.request.contextPath }/photo/assets/${vo.saveFileName}"
 										type="video/mp4" />
 								</video>
+								</li>
 							</c:when>
 							<c:otherwise>
-								<li><a class="image"
-									href="${pageContext.request.contextPath }/photo/assets/${vo.saveFileName}"
-									data-lightbox="roadtrip" data-title="${vo.comments }"> <img
-										src="${pageContext.request.contextPath }/photo/assets/${vo.saveFileName}"></a>
+								<li>
+									<a	href="${pageContext.request.contextPath }/photo/assets/${vo.saveFileName}"
+										data-lightbox="gallery" data-title="${vo.comments }" class="image"
+										style="background-image:url('${pageContext.request.contextPath }/photo/assets/${vo.saveFileName}')">&nbsp;</a>
 									<c:if test="${authUser.no == vo.usersNo}">
-										<a
-											href="${pageContext.request.contextPath }/photo/delete?no=${vo.no}"
+									<a href="${pageContext.request.contextPath }/photo/delete?no=${vo.no}"
 											class="del-button" title="삭제">삭제</a>
 									</c:if></li>
 							</c:otherwise>
