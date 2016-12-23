@@ -35,7 +35,12 @@ public class PhotoController {
 		model.addAttribute("list", list);
 		return "photo/index";
 	}
-
+	@ResponseBody
+	@RequestMapping("/api/index")
+	public JSONResult mainJson(Model model) {
+		List<Photo> list = photoService.selectAll();
+		return JSONResult.success(list);
+	}
 	@ResponseBody
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
 	public JSONResult upload(@RequestParam("file") MultipartFile file, @RequestParam("comments") String comments,
